@@ -12,5 +12,6 @@ void print2dmas(float** mas, int sizeX, int sizeY);
 
 float** transMatrix(float** inMas, int sizeX, int sizeY);
 float** multMatrix(float** firstMas, float** secondMas, int sizeM);
+float** divideMatrixByMatrix(float** firstMas, float** secondMas);
 
 #endif // MATRIX_H_INCLUDED

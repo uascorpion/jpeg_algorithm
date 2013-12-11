@@ -37,13 +37,15 @@ static void bmpImageInfoHeaderRead(int fd)
 }
 
 /* Parsing bmp-file for getting image matrix in 24-bit format */
-void bmp_parse(int fd)
+palette_rgb* bmp_parse(int fd)
 {
     bmpFileHeaderRead(fd);
     bmpImageInfoHeaderRead(fd);
         int * cur_file_adr;     /* Pointer for address in bitmap file */
         if (1 == img_bitCount) {
             /* TODO */
+            close(fd);
+            return NULL;
         }
 
         else if (4 == img_bitCount) {
@@ -91,8 +93,10 @@ void bmp_parse(int fd)
             /* Clearing memory */
             new_bitmap_image_pointer = new_bitmap_image_pointer_start;
             bitmap_image_pointer = bitmap_image_pointer_start;
-            free(new_bitmap_image_pointer);
+            //free(new_bitmap_image_pointer);
             free(bitmap_image_pointer);
+            close(fd);
+            return new_bitmap_image_pointer;
         }
 
         else if (8 == img_bitCount) {
@@ -182,8 +186,10 @@ void bmp_parse(int fd)
             /* Clearing memory */
             new_bitmap_image_pointer = new_bitmap_image_pointer_start;
             bitmap_image_pointer = bitmap_image_pointer_start;
-            free(new_bitmap_image_pointer);
+            //free(new_bitmap_image_pointer);
             free(bitmap_image_pointer);
+            close(fd);
+            return new_bitmap_image_pointer;
         }
 
         else if (16 == img_bitCount) {
@@ -222,8 +228,10 @@ void bmp_parse(int fd)
                     /* Clearing memory */
                     new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                     bitmap_image_pointer = bitmap_image_pointer_start;
-                    free(new_bitmap_image_pointer);
+                    //free(new_bitmap_image_pointer);
                     free(bitmap_image_pointer);
+                    close(fd);
+                    return new_bitmap_image_pointer;
                 }
                 else if (65536 == cur_info_header.biClrUsed) {
                     /* Read current image martix */
@@ -258,8 +266,10 @@ void bmp_parse(int fd)
                     /* Clearing memory */
                     new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                     bitmap_image_pointer = bitmap_image_pointer_start;
-                    free(new_bitmap_image_pointer);
+                    //free(new_bitmap_image_pointer);
                     free(bitmap_image_pointer);
+                    close(fd);
+                    return new_bitmap_image_pointer;
                 }
                 else {
                     printf("Unsupported BMP-file format\n");
@@ -304,8 +314,10 @@ void bmp_parse(int fd)
                 /* Clearing memory */
                 new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                 bitmap_image_pointer = bitmap_image_pointer_start;
-                free(new_bitmap_image_pointer);
+                //free(new_bitmap_image_pointer);
                 free(bitmap_image_pointer);
+                close(fd);
+                return new_bitmap_image_pointer;
             }
         }
 
@@ -318,7 +330,9 @@ void bmp_parse(int fd)
             printf("Read_OK\n");
 
             /* Clearing memory */
-            free(bitmap_image_pointer);
+            //free(bitmap_image_pointer);
+            close(fd);
+            return bitmap_image_pointer;
         }
 
         else if (32 == img_bitCount) {
@@ -353,13 +367,17 @@ void bmp_parse(int fd)
                 /* Clearing memory */
                 new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                 bitmap_image_pointer = bitmap_image_pointer_start;
-                free(new_bitmap_image_pointer);
+                //free(new_bitmap_image_pointer);
                 free(bitmap_image_pointer);
+                close(fd);
+                return new_bitmap_image_pointer;
             }
         }
 
         else {
             printf("Unsupported BMP-file format");
+            return NULL;
         }
     close(fd);
+    return NULL;
 }

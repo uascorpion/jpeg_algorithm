@@ -13,8 +13,6 @@
 #define FROM_END        2U
 #define PERMS           0666
 
-void bmp_parse(int fd);
-
 #pragma pack(push, 1)
 
 /* Definition of BMP-file header structure */
@@ -97,11 +95,13 @@ enum orientation_t { NORMAL, MIRROR };
 volatile BMPfileHeader cur_file_header;
 volatile BMPinfoHeader cur_info_header;
 
-int img_height;
-int img_width;
+dword_t img_height;
+dword_t img_width;
 int img_bitCount;
 compression_t img_compression;
 orientation_t orientation;
 long long int image_dots;
+
+palette_rgb* bmp_parse(int fd);
 
 #endif /* BMP_H_INCLUDED */

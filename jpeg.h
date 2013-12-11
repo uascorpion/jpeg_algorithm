@@ -24,6 +24,6 @@ color_YCbCr convertRGBtoYCbCr(palette_rgb inPixel);
 float** calculateDCTmatrix(void);
 float** calcQuantMatrix(int quality);
 
-void divideImageBySquers(int * mas, int sizeX, int sizeY);
+color_YCbCr* divideImageBySquers(color_YCbCr* mas,int sizeX, int sizeY, int curNumOfSqrX, int curNumOfSqrY, int numOfSqrX);
 
 #endif // JPEG_H_INCLUDED

@@ -61,6 +61,7 @@ float** multMatrix(float** firstMas, float** secondMas, int sizeM)
     return resMas;
 }
 
+/* Dividing matrix on matrix by elements */
 float** divideMatrixByMatrix(float** firstMas, float** secondMas)
 {
     int i,j;
