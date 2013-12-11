@@ -17,7 +17,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-byte_t** orderZigZag(byte_t* input_mas, byte_t sizeX, byte_t sizeY);
+float* orderZigZag(float** input_mas, byte_t sizeX, byte_t sizeY);
 
 color_YCbCr convertRGBtoYCbCr(palette_rgb inPixel);
 
