@@ -1,6 +1,8 @@
 #include "jpeg.h"
 
-/* Zig-zag ordering elements of sizeX x sizeY array */
+/*
+    Zig-zag ordering elements of sizeX x sizeY array
+*/
 float* orderZigZag (float** input_mas, byte_t sizeX, byte_t sizeY)
 {
    float* output_mas = (float*)malloc(sizeX * sizeY * sizeof(float));
@@ -43,7 +45,9 @@ float* orderZigZag (float** input_mas, byte_t sizeX, byte_t sizeY)
     return output_mas;
 }
 
-/* Converting color scheme from RGB to YCbCr */
+/*
+    Converting color scheme from RGB to YCbCr
+*/
 color_YCbCr convertRGBtoYCbCr (palette_rgb inPixel) {
     color_YCbCr outPixel;
     outPixel.Y = 0.299 * inPixel.red + 0.587 * inPixel.green + 0.114 * inPixel.blue;
@@ -52,7 +56,9 @@ color_YCbCr convertRGBtoYCbCr (palette_rgb inPixel) {
     return outPixel;
 }
 
-/* Dividing image matrix with size sizeX x sizeY in number of matrix with sizes 8 x 8  */
+/*
+    Dividing image matrix with size sizeX x sizeY in number of matrix with sizes 8 x 8
+*/
 color_YCbCr* divideImageBySquers(color_YCbCr* mas,int sizeX, int sizeY, int curNumOfSqrX, int curNumOfSqrY, int numOfSqrX)
 {
     long long int i,j;
@@ -69,7 +75,9 @@ color_YCbCr* divideImageBySquers(color_YCbCr* mas,int sizeX, int sizeY, int curN
     return outMas;
 }
 
-/* Calculating of Discrete Cosine Transform matrix for size "8" */
+/*
+    Calculating of Discrete Cosine Transform matrix for size "8"
+*/
 float** calculateDCTmatrix(void)
 {
     int i, j, sizeX, sizeY;
@@ -93,7 +101,9 @@ float** calculateDCTmatrix(void)
     return DCT;
 }
 
-/* Calculating quantization matrix */
+/*
+    Calculating quantization matrix
+*/
 float** calcQuantMatrix(int quality)
 {
     int i,j,sizeX,sizeY;
@@ -111,7 +121,9 @@ float** calcQuantMatrix(int quality)
     return outMatrix;
 }
 
-/* Proces of converting bitmap image to jpeg image */
+/*
+    Proces of converting bitmap image to jpeg image
+*/
 void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int quality)
 {
     /*
@@ -136,7 +148,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
     /*
         Calculating DCT matrix and transposed DCT matrix. Them will be used on the next step
-     */
+    */
     float** DCTmatrix = calculateDCTmatrix();
     float** TranspDCTMatrx = transMatrix(DCTmatrix, 8, 8);
 
@@ -145,16 +157,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
      */
     float** QuatnMatrix = calcQuantMatrix(quality);
 
-
     /*
         Dividing image on squares 8x8 and run compress algorithm for every of them
-     */
+    */
     int numOfSqrX = sizeX / 8;
     int numOfSqrY = sizeY / 8;
 
-    int curNumOfSqrX, curNumOfSqrY;
-    curNumOfSqrY = 0;
-    curNumOfSqrX = 0;
+    int curNumOfSqrX = 0;
+    int curNumOfSqrY = 0;
     color_YCbCr* curSqr;
 
     float** curSqrY = (float**) malloc(8 * sizeof(float*));
@@ -176,6 +186,8 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     float* curVectCb = (float*)malloc(64 * sizeof(float));
     float* curVectCr = (float*)malloc(64 * sizeof(float));
 
+    int k = 0; /* Square counter */
+
     while (curNumOfSqrY < numOfSqrY)
     {
         while (curNumOfSqrX < numOfSqrX)
@@ -183,7 +195,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             int i,j;
             /*
                 Compressing every square
-             */
+            */
             curSqr = divideImageBySquers(resMas, sizeX, sizeY, curNumOfSqrX, curNumOfSqrY, numOfSqrX);
             for (j = 0; j < 0; j++) {
                 for (i = 0; i < 0; i++) {
@@ -195,24 +207,25 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
             /*
                 Calculating Discrete Cosine Transform for every matrix (Y, Cb, Cr)
-             */
+            */
             curSqrY  = multMatrix(multMatrix(curSqrY,  DCTmatrix, 8), TranspDCTMatrx, 8);
             curSqrCb = multMatrix(multMatrix(curSqrCb, DCTmatrix, 8), TranspDCTMatrx, 8);
             curSqrCr = multMatrix(multMatrix(curSqrCr, DCTmatrix, 8), TranspDCTMatrx, 8);
 
             /*
                 Quantization every matrix (Y, Cb, Cr)
-             */
+            */
             curSqrY  = divideMatrixByMatrix(curSqrY,  QuatnMatrix);
             curSqrCb = divideMatrixByMatrix(curSqrCb, QuatnMatrix);
             curSqrCr = divideMatrixByMatrix(curSqrCr, QuatnMatrix);
 
             /*
                 ZigZag ordering elements of every matrix (Y, Cb, Cr)
-             */
-             curVectY  = orderZigZag(curSqrY,  8, 8);
-             curVectCb = orderZigZag(curSqrCb, 8, 8);
-             curVectCr = orderZigZag(curSqrCr, 8, 8);
+            */
+            curVectY  = orderZigZag(curSqrY,  8, 8);
+            curVectCb = orderZigZag(curSqrCb, 8, 8);
+            curVectCr = orderZigZag(curSqrCr, 8, 8);
+            printf("Converted square #%d\n",k++);
 
             curNumOfSqrX++;
         }

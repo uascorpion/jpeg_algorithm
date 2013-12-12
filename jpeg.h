@@ -25,5 +25,6 @@ float** calculateDCTmatrix(void);
 float** calcQuantMatrix(int quality);
 
 color_YCbCr* divideImageBySquers(color_YCbCr* mas,int sizeX, int sizeY, int curNumOfSqrX, int curNumOfSqrY, int numOfSqrX);
+void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int quality);
 
 #endif // JPEG_H_INCLUDED
