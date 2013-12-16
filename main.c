@@ -7,7 +7,7 @@ extern volatile BMPinfoHeader cur_info_header;
 
 int main()
 {
-    int fd = open("LENA512.bmp",O_RDONLY,0);    /* Creationg file descriptor */
+    int fd = open("C:\\Users\\Paul\\workspace\\jpeg_algorithm\\melexis.bmp",O_RDONLY,0);    /* Creationg file descriptor */
 
     if (-1 == fd) {
         printf("Can't open file\n");
@@ -15,7 +15,7 @@ int main()
 
     else {
         palette_rgb* bmpimg = bmp_parse(fd);
-        convertToJpeg(bmpimg, img_width, img_height, 2);
+        convertToJpeg(bmpimg, img_width, img_height, 3);
     }
 
 /*

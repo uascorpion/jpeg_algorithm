@@ -30,10 +30,11 @@ static void bmpImageInfoHeaderRead(int fd)
 
         img_compression = cur_info_header.biCompression;
         orientation = (cur_info_header.biHeight > 0) ? MIRROR : NORMAL;
-        printf("Orientation is %s ", (orientation == MIRROR) ? "MIRROR\n" : "NORMAL\n");
+        printf("Orientation is %s ", (orientation == MIRROR) ? "MIRRORED\n" : "NORMAL\n");
 
         /* Reading image matrix (as vector) */
         image_dots = img_height * img_width;    /* count of dots */
+        printf("Numner of pixels = %d\n", image_dots);
 }
 
 /* Parsing bmp-file for getting image matrix in 24-bit format */

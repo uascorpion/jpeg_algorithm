@@ -1,6 +1,21 @@
 #include "matrix.h"
 
-void print1dmas(byte_t * inputmas, int sizeX, int sizeY)
+/* Print 1D matrix (like to the 2D matrix) of float elements */
+void print1dmas(float* inputmas, int sizeX, int sizeY)
+{
+    int x, y;
+    for(y = 0; y < sizeY; y++)
+    {
+        for (x = 0; x < sizeX; x++)
+        {
+            printf("%f ", inputmas[x + y * sizeX]);
+        }
+        printf("\n");
+    }
+}
+
+/* Print 1D matrix (like to the 2D matrix) of integer elements */
+void print1dImas(int* inputmas, int sizeX, int sizeY)
 {
     int x, y;
     for(y = 0; y < sizeY; y++)
@@ -13,12 +28,25 @@ void print1dmas(byte_t * inputmas, int sizeX, int sizeY)
     }
 }
 
-void print2dmas(float** mas, int sizeX, int sizeY)
+/* Print 2D matrix of float elements */
+void print2dFmas(float** mas, int sizeX, int sizeY)
 {
     int x,y;
     for (y = 0; y < sizeY; y++) {
         for (x = 0; x < sizeX; x++) {
-            printf("%3.2f ",mas[y][x]);
+            printf("%f ", mas[y][x]);
+        }
+        printf("\n");
+    }
+}
+
+/* Print 2D matrix of integer elements */
+void print2dImas(int** mas, int sizeX, int sizeY)
+{
+    int x,y;
+    for (y = 0; y < sizeY; y++) {
+        for (x = 0; x < sizeX; x++) {
+            printf("%4d ",mas[y][x]);
         }
         printf("\n");
     }

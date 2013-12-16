@@ -10,14 +10,17 @@
 
 /* Structure dor default rgb-palette. Every byte is a color */
 typedef struct {
-    int  Y;
+    int Y;
     int Cb;
     int Cr;
 } color_YCbCr;
 
 #pragma pack(pop)
 
-float* orderZigZag(float** input_mas, byte_t sizeX, byte_t sizeY);
+void print1RGB(palette_rgb* inMas, long long int elnum);
+void print1YCbCr(color_YCbCr * inMas, long long int elnum);
+
+int* orderZigZag(float** input_mas, byte_t sizeX, byte_t sizeY);
 
 color_YCbCr convertRGBtoYCbCr(palette_rgb inPixel);
 
