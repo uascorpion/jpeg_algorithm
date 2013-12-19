@@ -6,8 +6,9 @@
 #include <math.h>
 #include "types.h"
 
-void print1dFmas(float * inputmas, int sizeX, int sizeY);
-void print1dImas(int * inputmas, int sizeX, int sizeY);
+void print1dmas(float* inputmas, int elNum);
+void print1dImas(int* inputmas, int elNum);
+void print1dCmas(char* inputmas, int sizeX, int sizeY);
 void print2dFmas(float** mas, int sizeX, int sizeY);
 void print2dImas(int** mas, int sizeX, int sizeY);
 

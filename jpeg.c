@@ -88,7 +88,7 @@ void print1YCbCr(color_YCbCr* inMas, long long int elnum)
 */
 int* orderZigZag (float** input_mas, byte_t sizeX, byte_t sizeY)
 {
-   int* output_mas = (int*)malloc(sizeX * sizeY * sizeof(int));
+    int* output_mas = (int*)malloc(sizeX * sizeY * sizeof(int));
 
     byte_t x,y,num;
     x = y = num = 0;
@@ -126,6 +126,52 @@ int* orderZigZag (float** input_mas, byte_t sizeX, byte_t sizeY)
     } while (num < (sizeX * sizeY - 1));
 
     return output_mas;
+}
+
+RLE_mas CodingRLE(int* inputMas)
+{
+    int* outMas = (int*)malloc(128 * sizeof(int));
+    int i;
+    int j = 0;
+    int zeroCounter = 0;
+    for (i = 0; i < 64; i++)
+    {
+        if (inputMas[i] != 0) {
+          outMas[j] = zeroCounter;
+          j++;
+          outMas[j] = inputMas[i];
+          j++;
+        }
+        else {
+                zeroCounter = 0;
+                while ((inputMas[i] == 0) && (i < 64)) {
+                    i++;
+                    zeroCounter++;
+                };
+                outMas[j] = zeroCounter;
+                j++;
+                if (i == 64) {
+                    outMas[j] = inputMas[i-1];
+                }
+                else {
+                    outMas[j] = inputMas[i];
+                    j++;
+                }
+                zeroCounter = 0;
+        }
+    }
+    //print1dImas(outMas,8, 8);
+
+    RLE_mas returnRes;
+    int* resMas = (int*)malloc((j+1)*sizeof(int));
+    for (i = 0; i <= j; i++) {
+        resMas[i] = outMas[i];
+    }
+
+    returnRes.mas = resMas;
+    returnRes.MasSize = j+1;
+    free(outMas);
+    return returnRes;
 }
 
 /*
@@ -294,13 +340,13 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
                   curSqrCr[j][i] = (curSqr[8 * j + i]).Cr;
                 }
             }
-            printf("\nDivided image\n");
-            printf("\nCurrent Y square\n\n");
-            print2dFmas(curSqrY,8,8);
-            printf("\nCurrent Cb square\n\n");
-            print2dFmas(curSqrCb,8,8);
-            printf("\nCurrent Cr square\n\n");
-            print2dFmas(curSqrCr,8,8);
+            //printf("\nDivided image\n");
+            //printf("\nCurrent Y square\n\n");
+            //print2dFmas(curSqrY,8,8);
+            //printf("\nCurrent Cb square\n\n");
+            //print2dFmas(curSqrCb,8,8);
+            //printf("\nCurrent Cr square\n\n");
+            //print2dFmas(curSqrCr,8,8);
 
             /*
                 Calculating Discrete Cosine Transform for every matrix (Y, Cb, Cr)
@@ -309,29 +355,29 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             curSqrCb = multMatrix(DCTmatrix, multMatrix(curSqrCb, TranspDCTMatrx, 8), 8);
             curSqrCr = multMatrix(DCTmatrix, multMatrix(curSqrCr, TranspDCTMatrx, 8), 8);
 
-            printf("\nDCT matrixes\n");
-            printf("\nCurrent Y square\n\n");
-            print2dFmas(curSqrY,8,8);
-            printf("\nCurrent Cb square\n\n");
-            print2dFmas(curSqrCb,8,8);
-            printf("\nCurrent Cr square\n\n");
-            print2dFmas(curSqrCr,8,8);
+            //printf("\nDCT matrixes\n");
+            //printf("\nCurrent Y square\n\n");
+            //print2dFmas(curSqrY,8,8);
+            //printf("\nCurrent Cb square\n\n");
+            //print2dFmas(curSqrCb,8,8);
+            //printf("\nCurrent Cr square\n\n");
+            //print2dFmas(curSqrCr,8,8);
 
             /*
                 Quantization every matrix (Y, Cb, Cr)
             */
 
-            float QuatnYMatrix[8][8] = {{16,11,10,16,24,40,51,61},{12,12,14,19,26,58,60,55},{14,13,16,24,40,57,69,56},{14,17,22,29,51,87,80,62},{18,22,37,56,68,109,103,77},{24,35,55,64,81,104,113,92},{49,64,78,87,103,121,120,101},{72,92,95,98,112,100,103,99}};
+            //float QuatnYMatrix[8][8] = {{16,11,10,16,24,40,51,61},{12,12,14,19,26,58,60,55},{14,13,16,24,40,57,69,56},{14,17,22,29,51,87,80,62},{18,22,37,56,68,109,103,77},{24,35,55,64,81,104,113,92},{49,64,78,87,103,121,120,101},{72,92,95,98,112,100,103,99}};
             curSqrY  = divideMatrixByMatrix(curSqrY,  QuatnMatrix);
             curSqrCb = divideMatrixByMatrix(curSqrCb, QuatnMatrix);
             curSqrCr = divideMatrixByMatrix(curSqrCr, QuatnMatrix);
 
-            printf("\nQuantizen matrixes\n");
-            printf("\nCurrent Y square\n\n");
+            printf("\n\nQuantizen matrixes\n");
+            printf("\n\nCurrent Y square\n\n");
             print2dFmas(curSqrY,8,8);
-            printf("\nCurrent Cb square\n\n");
+            printf("\n\nCurrent Cb square\n\n");
             print2dFmas(curSqrCb,8,8);
-            printf("\nCurrent Cr square\n\n");
+            printf("\n\nCurrent Cr square\n\n");
             print2dFmas(curSqrCr,8,8);
 
             /*
@@ -340,13 +386,27 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             curVectY  = orderZigZag(curSqrY,  8, 8);
             curVectCb = orderZigZag(curSqrCb, 8, 8);
             curVectCr = orderZigZag(curSqrCr, 8, 8);
-            printf("\nCurrent Y vector\n\n");
-            print1dImas(curVectY,8,8);
-            printf("\nCurrent Cb vector\n\n");
-            print1dImas(curVectCb,8,8);
-            printf("\nCurrent Cr vector\n\n");
-            print1dImas(curVectCr,8,8);
+            printf("\n\nCurrent Y vector\n\n");
+            print1dImas(curVectY,64);
+            printf("\n\nCurrent Cb vector\n\n");
+            print1dImas(curVectCb,64);
+            printf("\n\nCurrent Cr vector\n\n");
+            print1dImas(curVectCr,64);
             //printf("Converted square #%d\n",k++);
+
+            /*
+                RLE-coding of every matrix (Y, Cb, Cr)
+            */
+
+            RLE_mas rleY = CodingRLE(curVectY);
+            RLE_mas rleCb = CodingRLE(curVectCb);
+            RLE_mas rleCr = CodingRLE(curVectCr);
+            printf("\n\nRLE_Y_matrix\n\n");
+            print1dImas(rleY.mas, rleY.MasSize);
+            printf("\n\nRLE_Cb_matrix\n\n");
+            print1dImas(rleCb.mas, rleCb.MasSize);
+            printf("\n\nRLE_Cr_matrix\n\n");
+            print1dImas(rleCr.mas, rleCr.MasSize);
 
             curNumOfSqrX++;
         }

@@ -17,6 +17,11 @@ typedef struct {
 
 #pragma pack(pop)
 
+typedef struct {
+    int * mas;
+    int   MasSize;
+} RLE_mas;
+
 void print1RGB(palette_rgb* inMas, long long int elnum);
 void print1YCbCr(color_YCbCr * inMas, long long int elnum);
 
