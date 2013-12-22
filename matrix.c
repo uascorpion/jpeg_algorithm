@@ -29,17 +29,19 @@ void print1dImas(int* inputmas, int elNum)
 }
 
 /* Print 1D matrix (like to the 2D matrix) of integer elements */
-void print1dCmas(char* inputmas, int sizeX, int sizeY)
+void print1dCmas(char* inputmas, int elNum)
 {
-    int x, y;
-    for(y = 0; y < sizeY; y++)
+    int y;
+    for(y = 0; y < elNum; y++)
     {
-        for (x = 0; x < sizeX; x++)
-        {
-            printf("%c ", inputmas[x + y * sizeX]);
+        /*
+         if (y % 8 == 0) {
+            printf("\n");
         }
-        printf("\n");
+        */
+        printf("%c", inputmas[y]);
     }
+    printf("\n");
 }
 
 /* Print 2D matrix of float elements */

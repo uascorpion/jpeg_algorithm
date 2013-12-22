@@ -151,7 +151,7 @@ palette_rgb* bmp_parse(int fd)
             //
 
             /* Writting new bmp-file with 24-bit image */
-
+/*
             int fd_out = creat("LENA512_2.BMP",PERMS);
             BMPfileHeader new_file_header;
             BMPinfoHeader new_info_header;
@@ -162,7 +162,7 @@ palette_rgb* bmp_parse(int fd)
             new_info_header = cur_info_header;
             new_info_header.biBitCount = 24;
             new_info_header.biClrUsed = 0;
-
+*/
             /* Rotate picture */
             palette_rgb tempPixel;
             for (i = 0; i < (image_dots / 2); i++) {
@@ -174,6 +174,7 @@ palette_rgb* bmp_parse(int fd)
                 *bmpImgEnd--;
             }
 
+/*
             int * new_file_adr;
             new_file_adr = (int *) (&new_file_header);
             write(fd_out, new_file_adr, sizeof (BMPfileHeader));
@@ -183,7 +184,7 @@ palette_rgb* bmp_parse(int fd)
 
             write(fd_out, new_bitmap_image_pointer_start, (image_dots * sizeof(palette_rgb)));
             close(fd_out);
-
+*/
             /* Clearing memory */
             new_bitmap_image_pointer = new_bitmap_image_pointer_start;
             bitmap_image_pointer = bitmap_image_pointer_start;
