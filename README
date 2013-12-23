@@ -1,0 +1,4 @@
+Project wrote and compiled in Code::Blocks IDE under Windows-based OS.
+But, there are, UNIX-style of C-code, and used unix-like functions for
+operation with files. And as result, application can be compiled under
+UNIX-based OS and must work correctly.

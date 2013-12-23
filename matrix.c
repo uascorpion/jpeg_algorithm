@@ -1,6 +1,8 @@
 #include "matrix.h"
 
-/* Print 1D matrix (like to the 2D matrix) of float elements */
+/*
+    Print 1D matrix (like to the 2D matrix) of float elements
+*/
 void print1dmas(float* inputmas, int elNum)
 {
     int x, y;
@@ -15,7 +17,9 @@ void print1dmas(float* inputmas, int elNum)
     }
 }
 
-/* Print 1D matrix (like to the 2D matrix) of integer elements */
+/*
+    Print 1D matrix (like to the 2D matrix) of integer elements
+*/
 void print1dImas(int* inputmas, int elNum)
 {
     int y;
@@ -28,7 +32,9 @@ void print1dImas(int* inputmas, int elNum)
     }
 }
 
-/* Print 1D matrix (like to the 2D matrix) of integer elements */
+/*
+    Print 1D matrix (like to the 2D matrix) of integer elements
+*/
 void print1dCmas(char* inputmas, int elNum)
 {
     int y;
@@ -44,7 +50,9 @@ void print1dCmas(char* inputmas, int elNum)
     printf("\n");
 }
 
-/* Print 2D matrix of float elements */
+/*
+    Print 2D matrix of float elements
+*/
 void print2dFmas(float** mas, int sizeX, int sizeY)
 {
     int x,y;
@@ -56,7 +64,9 @@ void print2dFmas(float** mas, int sizeX, int sizeY)
     }
 }
 
-/* Print 2D matrix of integer elements */
+/*
+    Print 2D matrix of integer elements
+*/
 void print2dImas(int** mas, int sizeX, int sizeY)
 {
     int x,y;
@@ -68,7 +78,9 @@ void print2dImas(int** mas, int sizeX, int sizeY)
     }
 }
 
-/* Receive matrix, transposed to current */
+/*
+    Receive matrix, transposed to current
+*/
 float** transMatrix(float** inMas, int sizeX, int sizeY)
 {
     int i,j;
@@ -84,7 +96,9 @@ float** transMatrix(float** inMas, int sizeX, int sizeY)
     return outMas;
 }
 
-/* Multiplaying of two square float martix with size equal to sizeM */
+/*
+    Multiplaying of two square float martix with size equal to sizeM
+*/
 float** multMatrix(float** firstMas, float** secondMas, int sizeM)
 {
     float** resMas = (float**)malloc(sizeM * sizeof(float *));
@@ -105,7 +119,9 @@ float** multMatrix(float** firstMas, float** secondMas, int sizeM)
     return resMas;
 }
 
-/* Dividing matrix on matrix by elements */
+/*
+    Dividing matrix on matrix by elements
+*/
 float** divideMatrixByMatrix(float** firstMas, float** secondMas)
 {
     int i,j;
@@ -119,6 +135,5 @@ float** divideMatrixByMatrix(float** firstMas, float** secondMas)
             resMas[i][j] = roundf(firstMas[i][j] / secondMas[i][j]);
         }
     }
-
     return resMas;
 }

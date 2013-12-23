@@ -67,17 +67,17 @@ RLE_mas CodingRLE(int* inputMas)
         }
         else {
             zeroCounter = 1;
-                while ((inputMas[i] == 0) && (i < 63)) {
-                    i++;
-                    zeroCounter++;
-                    /*if (zeroCounter == 15) {
-                        outMas[j] = zeroCounter;
-                        j++;
-                        outMas[j] = inputMas[i];
-                        j++;
-                        zeroCounter = 0;
-                    }*/
-                };
+            while ((inputMas[i] == 0) && (i < 63)) {
+                i++;
+                zeroCounter++;
+                /*if (zeroCounter == 15) {
+                    outMas[j] = zeroCounter;
+                    j++;
+                    outMas[j] = inputMas[i];
+                    j++;
+                    zeroCounter = 0;
+                }*/
+            };
             outMas[j] = zeroCounter;
             j++;
             outMas[j] = inputMas[i];
@@ -138,9 +138,6 @@ char_mas codingDC(int inputDC)
     res[row + 1] = '\0';
 
     char* bincode = dec2bin(column, row);
-    /*for (i = 0; i < row; i++) {
-        res[row + 1 + i] =  bincode[i];
-    }*/
 
     char_mas charRes;
     charRes.mas = strcat(res, bincode);
@@ -182,7 +179,7 @@ RC_pair getRCpair(int inputAC)
 */
 char_mas Huffman(int Relem, int Zelem, bool isY)
 {
-    /* For Y matrixes */
+    /* Huffman code table for Y matrixes from jpeg standart */
     char HuffmY[160][17] = {{"00\0"},{"01\0"},{"100\0"},{"1011\0"},{"11010\0"},
                            {"1111000\0"},{"11111000\0"},{"1111110110\0"},{"1111111110000010\0"},{"1111111110000011\0"},
                            {"1100\0"},{"11011\0"},{"11110001\0"},{"111110110\0"},{"11111110110\0"},
@@ -216,7 +213,7 @@ char_mas Huffman(int Relem, int Zelem, bool isY)
                            {"11111111001\0"},{"1111111111110101\0"},{"1111111111110110\0"},{"1111111111110111\0"},{"1111111111111000\0"},
                            {"1111111111111001\0"},{"1111111111111010\0"},{"1111111111111011\0"},{"1111111111111101\0"},{"1111111111111110\0"}};
 
-    /* For Cb and Cr matrixes */
+    /* Huffman code table for Cb and Cr matrixes from jpeg standart */
     char HuffmC[160][17] = {{"01\0"},{"100\0"},{"1010\0"},{"11000\0"},{"11001\0"},
                            {"111000\0"},{"1111000\0"},{"111110100\0"},{"1111110110\0"},{"111111110100\0"},
                            {"1011\0"},{"111001\0"},{"11110110\0"},{"111110101\0"},{"11111110110\0"},
@@ -360,14 +357,13 @@ float** calcQuantMatrix(int quality)
 */
 void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int quality)
 {
-    print1RGB(inputMas, 64);
     /*
         Converting image to YCbCr
         Input is 24-bit bitmap image vector
      */
     color_YCbCr* resMas = (color_YCbCr*)malloc(sizeX * sizeY * sizeof(color_YCbCr));
     color_YCbCr* masBackup;
-    masBackup = resMas;
+    masBackup  = resMas;
 
     color_YCbCr pixel;
 
@@ -378,7 +374,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
          *resMas++;
          *inputMas++;
     }
-    free(inputMas);
+    //free(inputMas);
     resMas = masBackup;
     print1YCbCr(resMas, 64);
 
@@ -394,7 +390,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
     /*
         Calculating quantization matrix
-     */
+    */
     float** QuatnMatrix = calcQuantMatrix(quality);
 
     /*
@@ -406,7 +402,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     int curNumOfSqrX = 0;
     int curNumOfSqrY = 0;
 
-    color_YCbCr* curSqr;
+    color_YCbCr* curSqr = (color_YCbCr*)malloc(64 * sizeof(color_YCbCr));
 
     float** curSqrY = (float**) malloc(8 * sizeof(float*));
     for (i = 0; i < 8; i++) {
@@ -429,6 +425,9 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
     int k = 0;
 
+    /*
+        For storing DC-elements (current and prewious)
+    */
     int curDCYelement   = 0;
     int prewDCYelement  = 0;
     int curDCCbelement  = 0;
@@ -436,13 +435,16 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     int curDCCrelement  = 0;
     int prewDCCrelement = 0;
 
+    /*
+        Compressing every square
+    */
     while (curNumOfSqrY < numOfSqrY)
     {
         while (curNumOfSqrX < numOfSqrX)
         {
             int i,j;
             /*
-                Compressing every square
+                Get current block from all image
             */
             curSqr = divideImageBySquers(resMas, sizeX, sizeY, curNumOfSqrX, curNumOfSqrY, numOfSqrX);
             print1YCbCr(curSqr, 64);
@@ -453,38 +455,44 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
                   curSqrCr[j][i] = (curSqr[8 * j + i]).Cr;
                 }
             }
-            //printf("\nDivided image\n");
-            //printf("\nCurrent Y square\n\n");
-            //print2dFmas(curSqrY,8,8);
-            //printf("\nCurrent Cb square\n\n");
-            //print2dFmas(curSqrCb,8,8);
-            //printf("\nCurrent Cr square\n\n");
-            //print2dFmas(curSqrCr,8,8);
-
+/*
+            printf("\nDivided image\n");
+            printf("\nCurrent Y square\n\n");
+            print2dFmas(curSqrY,8,8);
+            printf("\nCurrent Cb square\n\n");
+            print2dFmas(curSqrCb,8,8);
+            printf("\nCurrent Cr square\n\n");
+            print2dFmas(curSqrCr,8,8);
+*/
             /*
                 Calculating Discrete Cosine Transform for every matrix (Y, Cb, Cr)
             */
             curSqrY  = multMatrix(DCTmatrix, multMatrix(curSqrY,  TranspDCTMatrx, 8), 8);
             curSqrCb = multMatrix(DCTmatrix, multMatrix(curSqrCb, TranspDCTMatrx, 8), 8);
             curSqrCr = multMatrix(DCTmatrix, multMatrix(curSqrCr, TranspDCTMatrx, 8), 8);
-
-            //printf("\nDCT matrixes\n");
-            //printf("\nCurrent Y square\n\n");
-            //print2dFmas(curSqrY,8,8);
-            //printf("\nCurrent Cb square\n\n");
-            //print2dFmas(curSqrCb,8,8);
-            //printf("\nCurrent Cr square\n\n");
-            //print2dFmas(curSqrCr,8,8);
-
+/*
+            printf("\nDCT matrixes\n");
+            printf("\nCurrent Y square\n\n");
+            print2dFmas(curSqrY,8,8);
+            printf("\nCurrent Cb square\n\n");
+            print2dFmas(curSqrCb,8,8);
+            printf("\nCurrent Cr square\n\n");
+            print2dFmas(curSqrCr,8,8);
+*/
             /*
                 Quantization every matrix (Y, Cb, Cr)
             */
-
-            //float QuatnYMatrix[8][8] = {{16,11,10,16,24,40,51,61},{12,12,14,19,26,58,60,55},{14,13,16,24,40,57,69,56},{14,17,22,29,51,87,80,62},{18,22,37,56,68,109,103,77},{24,35,55,64,81,104,113,92},{49,64,78,87,103,121,120,101},{72,92,95,98,112,100,103,99}};
+/*
+            //Quant matrix for Y part, recomended byjped standart
+            float QuantYMatrix[8][8] = {{16,11,10,16,24,40,51,61},{12,12,14,19,26,58,60,55},
+                                        {14,13,16,24,40,57,69,56},{14,17,22,29,51,87,80,62},
+                                        {18,22,37,56,68,109,103,77},{24,35,55,64,81,104,113,92},
+                                        {49,64,78,87,103,121,120,101},{72,92,95,98,112,100,103,99}};
+*/
             curSqrY  = divideMatrixByMatrix(curSqrY,  QuatnMatrix);
             curSqrCb = divideMatrixByMatrix(curSqrCb, QuatnMatrix);
             curSqrCr = divideMatrixByMatrix(curSqrCr, QuatnMatrix);
-
+/*
             printf("\n\nQuantizen matrixes\n");
             printf("\n\nCurrent Y square\n\n");
             print2dFmas(curSqrY,8,8);
@@ -492,7 +500,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             print2dFmas(curSqrCb,8,8);
             printf("\n\nCurrent Cr square\n\n");
             print2dFmas(curSqrCr,8,8);
-
+*/
             /*
                 ZigZag ordering elements of every matrix (Y, Cb, Cr)
             */
@@ -505,66 +513,99 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             print1dImas(curVectCb,64);
             printf("\n\nCurrent Cr vector\n\n");
             print1dImas(curVectCr,64);
-            //printf("Converted square #%d\n",k++);
 
             /*
                 RLE-coding of every matrix (Y, Cb, Cr) /Only ACi elements/
             */
             RLE_mas rleY  = CodingRLE(curVectY);
-            RLE_mas rleCb = CodingRLE(curVectCb);
-            RLE_mas rleCr = CodingRLE(curVectCr);
-            printf("\n\nRLE_Y_matrix\n\n");
-            print1dImas(rleY.mas, rleY.MasSize);
-            printf("\n\nRLE_Cb_matrix\n\n");
-            print1dImas(rleCb.mas, rleCb.MasSize);
-            printf("\n\nRLE_Cr_matrix\n\n");
-            print1dImas(rleCr.mas, rleCr.MasSize);
+            int* masRLECoddedY = (int*)malloc(rleY.MasSize*sizeof(int));
+            masRLECoddedY = rleY.mas;
+            int masRLECoddedYCnt = rleY.MasSize;
 
-            curDCYelement  = curVectY[0]  - prewDCYelement;
+            RLE_mas rleCb = CodingRLE(curVectCb);
+            int* masRLECoddedCb = (int*)malloc(rleCb.MasSize*sizeof(int));
+            masRLECoddedCb = rleCb.mas;
+            int masRLECoddedCbCnt = rleCb.MasSize;
+
+            RLE_mas rleCr = CodingRLE(curVectCr);
+            int* masRLECoddedCr = (int*)malloc(rleCr.MasSize*sizeof(int));
+            masRLECoddedCr = rleCr.mas;
+            int masRLECoddedCrCnt = rleCr.MasSize;
+
+            printf("\n\nRLE_Y_matrix\n\n");
+            print1dImas(masRLECoddedY, masRLECoddedYCnt);
+            printf("\n\nRLE_Cb_matrix\n\n");
+            print1dImas(masRLECoddedCb, masRLECoddedCbCnt);
+            printf("\n\nRLE_Cr_matrix\n\n");
+            print1dImas(masRLECoddedCr, masRLECoddedCrCnt);
+
+            /*
+                Get DC element of every matrix
+            */
+            curDCYelement  = curVectY [0] - prewDCYelement;
             curDCCbelement = curVectCb[0] - prewDCCbelement;
             curDCCrelement = curVectCr[0] - prewDCCrelement;
 
+            /*
+                Huffman codding DC element of every matrix
+            */
             char_mas coddedYDC  = codingDC(curDCYelement);
+            char* coddedYDCval = (char*)malloc(coddedYDC.MasSize * sizeof(char));
+            coddedYDCval = coddedYDC.mas;
+            int coddedYDClen = coddedYDC.MasSize;
+
             char_mas coddedCbDC = codingDC(curDCCbelement);
+            char* coddedCbDCval = (char*)malloc(coddedCbDC.MasSize * sizeof(char));
+            coddedCbDCval = coddedCbDC.mas;
+            int coddedCbDClen = coddedCbDC.MasSize;
+
             char_mas coddedCrDC = codingDC(curDCCrelement);
+            char* coddedCrDCval = (char*)malloc(coddedCrDC.MasSize * sizeof(char));
+            coddedCrDCval = coddedCrDC.mas;
+            int coddedCrDClen = coddedCrDC.MasSize;
 
             printf("\nY_DC\n");
-            print1dCmas(coddedYDC.mas, coddedYDC.MasSize);
+            print1dCmas(coddedYDCval, coddedYDClen);
 
             printf("\nCb_DC\n");
-            print1dCmas(coddedCbDC.mas, coddedCbDC.MasSize);
+            print1dCmas(coddedCbDCval, coddedCbDClen);
 
             printf("\nCr_DC\n");
-            print1dCmas(coddedCrDC.mas, coddedCrDC.MasSize);
+            print1dCmas(coddedCrDCval, coddedCrDClen);
 
-            char_mas coddedYAC;
+            /*
+                Huffman codding of every AC elenet of every matrix and concatenate result with codded DC element
+            */
+            char* coddedY = (char*)malloc(coddedYDClen * sizeof(char));
+            strcpy(coddedY, coddedYDCval);
+            int coddedYlen = coddedYDClen;
             int AC, Z;
-            for (k = 1; k < rleY.MasSize; k++)
+            for (k = 1; k < masRLECoddedYCnt; k++)
             {
-                AC = rleY.mas[k];
-                Z  = rleY.mas[k-1];
+                AC = masRLECoddedY[k];
+                Z  = masRLECoddedY[k-1];
+
                 char_mas elementYAC = codingAC(AC, Z, true);
-                if (k == 1) {
-                    char* firstMas = elementYAC.mas;
-                    coddedYAC.mas = strcpy(coddedYAC.mas, firstMas);
-                    coddedYAC.MasSize = elementYAC.MasSize;
-                }
-                else {
-                    char* prew_mas = coddedYAC.mas;
-                    coddedYAC.mas = strcat(prew_mas, elementYAC.mas);
-                    coddedYAC.MasSize += elementYAC.MasSize;
-                }
+
+                coddedYlen += elementYAC.MasSize;
+                coddedY = (char*)realloc(coddedY, coddedYlen * sizeof(char));
+                strcat(coddedY, elementYAC.mas);
                 k++;
             }
 /*
-            char_mas coddedCbAC;
-            for (k = 1; k < rleCb.MasSize; k++)
+            char* coddedCb = (char*)malloc(coddedCbDClen * sizeof(char));
+            strcpy(coddedY, coddedCbDCval);
+            int coddedCblen = coddedCbDClen;
+            for (k = 1; k < masRLECoddedCbCnt; k++)
             {
-                AC = rleCb.mas[k];
-                Z  = rleCb.mas[k-1];
+                AC = masRLECoddedCb[k];
+                Z  = masRLECoddedCb[k-1];
+
                 char_mas elementCbAC = codingAC(AC, Z, false);
-                strcat(coddedCbAC.mas, elementCbAC.mas);
-                coddedCbAC.MasSize += elementCbAC.MasSize;
+
+                coddedCblen += elementCbAC.MasSize;
+                coddedCb = (char*)realloc(coddedCb, coddedCblen * sizeof(char));
+                strcat(coddedCb, elementCbAC.mas);
                 k++;
             }
 
@@ -579,23 +620,11 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
                 k++;
             }
 */
-            char_mas coddedY;
-            coddedY.mas = strcat(coddedYDC.mas, coddedYAC.mas);
-            coddedY.MasSize = coddedYDC.MasSize + coddedYAC.MasSize;
-/*
-            char_mas coddedCb;
-            coddedCb.mas = strcat(coddedCbDC.mas, coddedCbAC.mas);
-            coddedCb.MasSize = coddedCbDC.MasSize + coddedCbAC.MasSize;
-
-            char_mas coddedCr;
-            coddedCr.mas = strcat(coddedCrDC.mas, coddedCrAC.mas);
-            coddedCr.MasSize = coddedCrDC.MasSize + coddedCrAC.MasSize;
-*/
             printf("\n_Codded_Y_\n");
-            print1dCmas(coddedY.mas, coddedY.MasSize);
+            print1dCmas(coddedY, coddedYlen);
 /*
             printf("\n_Codded_Cb_\n");
-            print1dCmas(coddedCb.mas, coddedCb.MasSize);
+            print1dCmas(coddedCb, coddedCblen);
 
             printf("\n_Codded_Cr_\n");
             print1dCmas(coddedCr.mas, coddedCr.MasSize);

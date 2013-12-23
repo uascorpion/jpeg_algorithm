@@ -1,5 +1,8 @@
 #include "jpeg_additional.h"
 
+/*
+    Printing all elemens of array of palette_rgb elements
+*/
 void print1RGB(palette_rgb* inMas, long long int elnum)
 {
     int* Rmas = (int*)malloc(elnum * sizeof(int));
@@ -41,6 +44,9 @@ void print1RGB(palette_rgb* inMas, long long int elnum)
     free(Bmas);
 }
 
+/*
+    Printing all elemens of array of color_YCbCr elements
+*/
 void print1YCbCr(color_YCbCr* inMas, long long int elnum)
 {
     int* Ymas  = (int*)malloc(elnum * sizeof(int));
@@ -83,7 +89,9 @@ void print1YCbCr(color_YCbCr* inMas, long long int elnum)
     free(Crmas);
 }
 
-
+/*
+    Converting decimal value to binary (stored in char* array)
+*/
 char* dec2bin(int n, int codeLong)
 {
    int c, d, counter;
@@ -100,4 +108,27 @@ char* dec2bin(int n, int codeLong)
    }
    *(pointer+counter) = '\0';
    return  pointer;
+}
+
+/*
+    Converting binary value (stored in char* array) to decimal value
+*/
+long long int bin2dec(char *bin)
+{
+    int b , k, n;
+    int len = 0;
+    long long int sum = 0;
+    len = strlen(bin) - 1;
+    for(k = 0; k <= len; k++) {
+        b = 1;
+        n = (bin[k] - '0'); // char to numeric value
+        if ((n > 1) || (n < 0)) {
+            puts("\n\n ERROR! BINARY has only 1 and 0!\n");
+            return 0;
+        }
+        b = b << (len - k);
+        // sum it up
+        sum = sum + n * b;
+    }
+    return sum;
 }
