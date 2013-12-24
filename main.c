@@ -5,7 +5,7 @@
 int main()
 {
 
-    int fd = open("melexis.bmp",O_RDONLY,0);    // Creationg file descriptor
+    int fd = open("melexis.bmp",O_RDONLY,0);    /* Creationg file descriptor */
 
     if (-1 == fd) {
         printf("Can't open file\n");

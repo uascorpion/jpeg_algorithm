@@ -121,13 +121,13 @@ long long int bin2dec(char *bin)
     len = strlen(bin) - 1;
     for(k = 0; k <= len; k++) {
         b = 1;
-        n = (bin[k] - '0'); // char to numeric value
+        n = (bin[k] - '0'); /* char to numeric value */
         if ((n > 1) || (n < 0)) {
             puts("\n\n ERROR! BINARY has only 1 and 0!\n");
             return 0;
         }
         b = b << (len - k);
-        // sum it up
+        /* sum it up */
         sum = sum + n * b;
     }
     return sum;

@@ -1,5 +1,6 @@
 #include "jpeg.h"
 #include "jpeg_additional.h"
+#include <stdlib.h>
 
 /* jpegsnoop */
 
@@ -70,13 +71,13 @@ RLE_mas CodingRLE(int* inputMas)
             while ((inputMas[i] == 0) && (i < 63)) {
                 i++;
                 zeroCounter++;
-                /*if (zeroCounter == 15) {
+                if (zeroCounter == 15) {
                     outMas[j] = zeroCounter;
                     j++;
                     outMas[j] = inputMas[i];
                     j++;
                     zeroCounter = 0;
-                }*/
+                }
             };
             outMas[j] = zeroCounter;
             j++;
@@ -85,7 +86,9 @@ RLE_mas CodingRLE(int* inputMas)
             zeroCounter = 0;
         }
     }
-    //print1dImas(outMas,8, 8);
+    /*
+        print1dImas(outMas,8, 8);
+    */
 
     RLE_mas returnRes;
     int* resMas = (int*)malloc((j)*sizeof(int));
@@ -124,8 +127,10 @@ char_mas codingDC(int inputDC)
             }
         }
     }
+/*
     printf("\nRow = %d \n", row);
     printf("\nColumn = %d\n", column);
+*/
     char* res = (char*)malloc((row + 2) * sizeof(char));
     for (i = 0; i <= row; i++) {
         if (i < row) {
@@ -264,16 +269,23 @@ char_mas Huffman(int Relem, int Zelem, bool isY)
 */
 char_mas codingAC(int inputAC,int inputZ, bool isY)
 {
-    int R,C;
-    RC_pair RCpair = getRCpair(inputAC);
-    R = RCpair.R;
-    C = RCpair.C;
+    if (inputAC == 0) {
+        char_mas result;
+        result.mas = "1010\0";   /* EOB-element */
+        result.MasSize = strlen(result.mas);
+        return result;
+    }
+    else {
+        int R,C;
+        RC_pair RCpair = getRCpair(inputAC);
+        R = RCpair.R;
+        C = RCpair.C;
 
-    char_mas result;
-    result.mas = strcat(Huffman(R, inputZ, isY).mas, dec2bin(C, R));
-    result.MasSize = strlen(result.mas);
-
-    return result;
+        char_mas result;
+        result.mas = strcat(Huffman(R, inputZ, isY).mas, dec2bin(C, R));
+        result.MasSize = strlen(result.mas);
+        return result;
+    }
 }
 
 /*
@@ -374,19 +386,23 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
          *resMas++;
          *inputMas++;
     }
-    //free(inputMas);
+    /* free(inputMas); */
     resMas = masBackup;
-    print1YCbCr(resMas, 64);
+    /* print1YCbCr(resMas, 64); */
 
     /*
         Calculating DCT matrix and transposed DCT matrix. Them will be used on the next step
     */
     float** DCTmatrix = calcDCTmatrix();
-    //printf("\nDCT matrix\n\n");
-    //print2dmas(DCTmatrix, 8, 8);
+    /*
+        printf("\nDCT matrix\n\n");
+        print2dmas(DCTmatrix, 8, 8);
+    */
     float** TranspDCTMatrx = transMatrix(DCTmatrix, 8, 8);
-    //printf("\nTransp DCT matrix\n\n");
-    //print2dmas(TranspDCTMatrx, 8, 8);
+    /*
+        printf("\nTransp DCT matrix\n\n");
+        print2dmas(TranspDCTMatrx, 8, 8);
+    */
 
     /*
         Calculating quantization matrix
@@ -447,7 +463,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
                 Get current block from all image
             */
             curSqr = divideImageBySquers(resMas, sizeX, sizeY, curNumOfSqrX, curNumOfSqrY, numOfSqrX);
-            print1YCbCr(curSqr, 64);
+            /* print1YCbCr(curSqr, 64); */
             for (j = 0; j < 8; j++) {
                 for (i = 0; i < 8; i++) {
                   curSqrY [j][i] = (curSqr[8 * j + i]).Y;
@@ -507,13 +523,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             curVectY  = orderZigZag(curSqrY,  8, 8);
             curVectCb = orderZigZag(curSqrCb, 8, 8);
             curVectCr = orderZigZag(curSqrCr, 8, 8);
+/*
             printf("\n\nCurrent Y vector\n\n");
             print1dImas(curVectY,64);
             printf("\n\nCurrent Cb vector\n\n");
             print1dImas(curVectCb,64);
             printf("\n\nCurrent Cr vector\n\n");
             print1dImas(curVectCr,64);
-
+*/
             /*
                 RLE-coding of every matrix (Y, Cb, Cr) /Only ACi elements/
             */
@@ -531,14 +548,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             int* masRLECoddedCr = (int*)malloc(rleCr.MasSize*sizeof(int));
             masRLECoddedCr = rleCr.mas;
             int masRLECoddedCrCnt = rleCr.MasSize;
-
+/*
             printf("\n\nRLE_Y_matrix\n\n");
             print1dImas(masRLECoddedY, masRLECoddedYCnt);
             printf("\n\nRLE_Cb_matrix\n\n");
             print1dImas(masRLECoddedCb, masRLECoddedCbCnt);
             printf("\n\nRLE_Cr_matrix\n\n");
             print1dImas(masRLECoddedCr, masRLECoddedCrCnt);
-
+*/
             /*
                 Get DC element of every matrix
             */
@@ -546,6 +563,9 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             curDCCbelement = curVectCb[0] - prewDCCbelement;
             curDCCrelement = curVectCr[0] - prewDCCrelement;
 
+            prewDCYelement  = curVectY[0];
+            prewDCCbelement = curVectCb[0];
+            prewDCCrelement = curVectCr[0];
             /*
                 Huffman codding DC element of every matrix
             */
@@ -563,7 +583,7 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             char* coddedCrDCval = (char*)malloc(coddedCrDC.MasSize * sizeof(char));
             coddedCrDCval = coddedCrDC.mas;
             int coddedCrDClen = coddedCrDC.MasSize;
-
+/*
             printf("\nY_DC\n");
             print1dCmas(coddedYDCval, coddedYDClen);
 
@@ -572,66 +592,80 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
             printf("\nCr_DC\n");
             print1dCmas(coddedCrDCval, coddedCrDClen);
-
+*/
             /*
                 Huffman codding of every AC elenet of every matrix and concatenate result with codded DC element
             */
-            char* coddedY = (char*)malloc(coddedYDClen * sizeof(char));
+            char* coddedY = (char*)malloc(coddedYDClen + 64 * 17 * sizeof(char));
             strcpy(coddedY, coddedYDCval);
+            //free(coddedYDCval);
             int coddedYlen = coddedYDClen;
-            int AC, Z;
+            int ACY, ZY;
             for (k = 1; k < masRLECoddedYCnt; k++)
             {
-                AC = masRLECoddedY[k];
-                Z  = masRLECoddedY[k-1];
+                ACY = masRLECoddedY[k];
+                ZY  = masRLECoddedY[k-1];
 
-                char_mas elementYAC = codingAC(AC, Z, true);
+                char_mas elementYAC = codingAC(ACY, ZY, true);
 
                 coddedYlen += elementYAC.MasSize;
-                coddedY = (char*)realloc(coddedY, coddedYlen * sizeof(char));
                 strcat(coddedY, elementYAC.mas);
                 k++;
             }
-/*
-            char* coddedCb = (char*)malloc(coddedCbDClen * sizeof(char));
-            strcpy(coddedY, coddedCbDCval);
+            coddedY = (char*)realloc(coddedY, coddedYlen * sizeof(char));
+            free(masRLECoddedY);
+
+            char* coddedCb = (char*)malloc(coddedCbDClen + 64 * 17 * sizeof(char));
+            strcpy(coddedCb, coddedCbDCval);
+            //free(coddedCbDCval);
             int coddedCblen = coddedCbDClen;
+            int ACCb, ZCb;
             for (k = 1; k < masRLECoddedCbCnt; k++)
             {
-                AC = masRLECoddedCb[k];
-                Z  = masRLECoddedCb[k-1];
+                ACCb = masRLECoddedCb[k];
+                ZCb  = masRLECoddedCb[k-1];
 
-                char_mas elementCbAC = codingAC(AC, Z, false);
+                char_mas elementCbAC = codingAC(ACCb, ZCb, false);
 
                 coddedCblen += elementCbAC.MasSize;
-                coddedCb = (char*)realloc(coddedCb, coddedCblen * sizeof(char));
                 strcat(coddedCb, elementCbAC.mas);
                 k++;
             }
+            coddedCb = (char*)realloc(coddedCb, coddedCblen * sizeof(char));
+            free(masRLECoddedCb);
 
-            char_mas coddedCrAC;
-            for (k = 1; k < rleCr.MasSize; k++)
+            char* coddedCr = (char*)malloc(coddedCrDClen + 64 * 17 * sizeof(char));
+            strcpy(coddedCr, coddedCrDCval);
+            //free(coddedCrDCval);
+            int coddedCrlen = coddedCrDClen;
+            int ACCr, ZCr;
+            for (k = 1; k < masRLECoddedCrCnt; k++)
             {
-                AC = rleCr.mas[k];
-                Z  = rleCr.mas[k-1];
-                char_mas elementCrAC = codingAC(AC, Z, false);
-                strcat(coddedCrAC.mas, elementCrAC.mas);
-                coddedCrAC.MasSize += elementCrAC.MasSize;
+                ACCr = masRLECoddedCr[k];
+                ZCr  = masRLECoddedCr[k-1];
+
+                char_mas elementCrAC = codingAC(ACCr, ZCr, false);
+
+                coddedCrlen += elementCrAC.MasSize;
+                strcat(coddedCr, elementCrAC.mas);
                 k++;
             }
-*/
+            coddedCr = (char*)realloc(coddedCr, coddedCrlen * sizeof(char));
+            free(masRLECoddedCr);
+
             printf("\n_Codded_Y_\n");
             print1dCmas(coddedY, coddedYlen);
-/*
+
             printf("\n_Codded_Cb_\n");
             print1dCmas(coddedCb, coddedCblen);
 
             printf("\n_Codded_Cr_\n");
-            print1dCmas(coddedCr.mas, coddedCr.MasSize);
-*/
-            prewDCYelement  = curVectY[0];
-            prewDCCbelement = curVectCb[0];
-            prewDCCrelement = curVectCr[0];
+            print1dCmas(coddedCr, coddedCrlen);
+
+            free(coddedY);
+            free(coddedCb);
+            free(coddedCr);
+
             curNumOfSqrX++;
         }
         curNumOfSqrX = 0;

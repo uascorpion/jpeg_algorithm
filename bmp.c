@@ -94,7 +94,7 @@ palette_rgb* bmp_parse(int fd)
             /* Clearing memory */
             new_bitmap_image_pointer = new_bitmap_image_pointer_start;
             bitmap_image_pointer = bitmap_image_pointer_start;
-            //free(new_bitmap_image_pointer);
+            /* free(new_bitmap_image_pointer); */
             free(bitmap_image_pointer);
             close(fd);
             return new_bitmap_image_pointer;
@@ -126,10 +126,9 @@ palette_rgb* bmp_parse(int fd)
             palette_rgb *new_bitmap_image_pointer = malloc(image_dots * sizeof(palette_rgb));
             palette_rgb *new_bitmap_image_pointer_start;
 
-            //start of image matrix, used in rotation operation
+            /* start of image matrix, used in rotation operation */
             palette_rgb *bmpImgStrt;
             bmpImgStrt = new_bitmap_image_pointer;
-            //
 
             /* Backup pointer to the start of image for free memory in future */
             new_bitmap_image_pointer_start = new_bitmap_image_pointer;
@@ -145,10 +144,9 @@ palette_rgb* bmp_parse(int fd)
                 *bitmap_image_pointer++;
             }
 
-            //end of image matrix, used in rotation operation
+            /* end of image matrix, used in rotation operation */
             palette_rgb *bmpImgEnd;
             bmpImgEnd = new_bitmap_image_pointer;
-            //
 
             /* Writting new bmp-file with 24-bit image */
 /*
@@ -188,7 +186,7 @@ palette_rgb* bmp_parse(int fd)
             /* Clearing memory */
             new_bitmap_image_pointer = new_bitmap_image_pointer_start;
             bitmap_image_pointer = bitmap_image_pointer_start;
-            //free(new_bitmap_image_pointer);
+            /* free(new_bitmap_image_pointer); */
             free(bitmap_image_pointer);
             close(fd);
             return new_bitmap_image_pointer;
@@ -230,7 +228,7 @@ palette_rgb* bmp_parse(int fd)
                     /* Clearing memory */
                     new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                     bitmap_image_pointer = bitmap_image_pointer_start;
-                    //free(new_bitmap_image_pointer);
+                    /* free(new_bitmap_image_pointer); */
                     free(bitmap_image_pointer);
                     close(fd);
                     return new_bitmap_image_pointer;
@@ -268,7 +266,7 @@ palette_rgb* bmp_parse(int fd)
                     /* Clearing memory */
                     new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                     bitmap_image_pointer = bitmap_image_pointer_start;
-                    //free(new_bitmap_image_pointer);
+                    /* free(new_bitmap_image_pointer); */
                     free(bitmap_image_pointer);
                     close(fd);
                     return new_bitmap_image_pointer;
@@ -316,7 +314,7 @@ palette_rgb* bmp_parse(int fd)
                 /* Clearing memory */
                 new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                 bitmap_image_pointer = bitmap_image_pointer_start;
-                //free(new_bitmap_image_pointer);
+                /* free(new_bitmap_image_pointer); */
                 free(bitmap_image_pointer);
                 close(fd);
                 return new_bitmap_image_pointer;
@@ -332,7 +330,7 @@ palette_rgb* bmp_parse(int fd)
             printf("Read_OK\n");
 
             /* Clearing memory */
-            //free(bitmap_image_pointer);
+            /* free(bitmap_image_pointer); */
             close(fd);
             return bitmap_image_pointer;
         }
@@ -369,7 +367,7 @@ palette_rgb* bmp_parse(int fd)
                 /* Clearing memory */
                 new_bitmap_image_pointer = new_bitmap_image_pointer_start;
                 bitmap_image_pointer = bitmap_image_pointer_start;
-                //free(new_bitmap_image_pointer);
+                /* free(new_bitmap_image_pointer); */
                 free(bitmap_image_pointer);
                 close(fd);
                 return new_bitmap_image_pointer;
