@@ -1,7 +1,7 @@
 #include "bmp.h"
-#include "jpeg_omp.h"
+#include "jpeg.h"
 #include "matrix.h"
-#include <stdio.h>
+
 
 #if defined _USEOPENMP
 int thread_number;

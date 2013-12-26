@@ -690,9 +690,9 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             free(curSqrCr);
         }
     }
-#if defined _USEOPENMP
+//#if defined _USEOPENMP
     #pragma omp end parallel
-#endif // USEOPENMP
+//#endif // USEOPENMP
 
     char* all_image_bit_sream = (char*)malloc((imageBitSize + 1) * sizeof(char));
     strcpy(all_image_bit_sream,"\0");
@@ -710,13 +710,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
     printf("BitsCount = %d", imageBitSize);
     printf("\n Time of encoding is = %f\n", diff_time);
+    writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_openmp.jpeg");
 #else
     t = clock() - t;
     printf("BitsCount = %d", imageBitSize);
     printf("\nEncoding time = %f\n", (((float)t) / CLOCKS_PER_SEC));
+    writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_.jpeg");
 #endif // USEOPENMP
 
-    writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_.jpeg");
     unsigned long long int imageBitSizeRes = strlen(all_image_bit_sream);
 
     /* Free unused memory */
