@@ -26,15 +26,15 @@ static void bmpImageInfoHeaderRead(int fd)
         img_width = cur_info_header.biWidth;
 
         img_bitCount = cur_info_header.biBitCount;  /* Number of bits in image */
-        printf("This is %d-bit image\n", img_bitCount);
+        printf("\nThis is %d-bit image\n", img_bitCount);
 
         img_compression = cur_info_header.biCompression;
         orientation = (cur_info_header.biHeight > 0) ? MIRROR : NORMAL;
-        printf("Orientation is %s ", (orientation == MIRROR) ? "MIRRORED\n" : "NORMAL\n");
+        //printf("\nOrientation is %s ", (orientation == MIRROR) ? "MIRRORED\n" : "NORMAL\n");
 
         /* Reading image matrix (as vector) */
         image_dots = img_height * img_width;    /* count of dots */
-        printf("Numner of pixels = %d\n", image_dots);
+        printf("Number of pixels = %d\n", image_dots);
 }
 
 /* Parsing bmp-file for getting image matrix in 24-bit format */
@@ -171,7 +171,6 @@ palette_rgb* bmp_parse(int fd)
                 *bmpImgStrt++;
                 *bmpImgEnd--;
             }
-
 /*
             int * new_file_adr;
             new_file_adr = (int *) (&new_file_header);

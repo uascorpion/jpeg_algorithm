@@ -1,5 +1,4 @@
 #include "jpeg_additional.h"
-
 /*
     Printing all elemens of array of palette_rgb elements
 */
@@ -27,7 +26,7 @@ void print1RGB(palette_rgb* inMas, long long int elnum)
     printf("\n Green part\n\n");
     for (i = 0; i < (elnum/8); i++) {
         for(j = 0; j < 8; j++) {
-            printf("%4d ",Gmas[i * 8 + j]);
+            printf("%4d ", Gmas[i * 8 + j]);
         }
         printf("\n");
     }
@@ -35,7 +34,7 @@ void print1RGB(palette_rgb* inMas, long long int elnum)
     printf("\n Blue part\n\n");
     for (i = 0; i < (elnum/8); i++) {
         for(j = 0; j < 8; j++) {
-            printf("%4d ",Bmas[i * 8 + j]);
+            printf("%4d ", Bmas[i * 8 + j]);
         }
         printf("\n");
     }
@@ -95,7 +94,7 @@ void print1YCbCr(color_YCbCr* inMas, long long int elnum)
 char* dec2bin(int n, int codeLong)
 {
    int c, d, counter;
-   char* pointer = (char*)malloc(codeLong);
+   char* pointer = (char*)malloc(codeLong+1);
    counter = 0;
    for ( c = (codeLong-1) ; c >= 0 ; c-- )
    {
@@ -131,4 +130,11 @@ long long int bin2dec(char *bin)
         sum = sum + n * b;
     }
     return sum;
+}
+
+void writeJpeg(char* imagestream,int Imgsize, char* imagename)
+{
+    int fd_out = creat(imagename, PERMS);
+    write(fd_out, imagestream, Imgsize);
+    close(fd_out);
 }

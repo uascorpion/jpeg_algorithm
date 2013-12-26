@@ -114,4 +114,14 @@ typedef struct {
     int R;
     int Z;
 } RZ_pair;
+
+typedef struct {
+    char* Ymas;
+//    int   Ycnt;
+    char* Cbmas;
+//    int   Cbcnt;
+    char* Crmas;
+//    int   Crcnt;
+} jCoddedSquare;
+
 #endif /* TYPES_H_INCLUDED */
