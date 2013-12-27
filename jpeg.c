@@ -5,9 +5,12 @@
 
 #if defined _USEOPENMP
 #include <omp.h>
-
 extern thread_number;
 #endif // defined
+
+#if defined _USEMPI
+#include <mpi.h>
+#endif //define
 
 /*
     Zig-zag ordering elements of sizeX x sizeY array
@@ -390,10 +393,24 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     color_YCbCr* resMas = (color_YCbCr*)malloc(sizeX * sizeY * sizeof(color_YCbCr));
     color_YCbCr* masBackup;
     masBackup  = resMas;
-
+#if defined _USEMPI
+if (world_rank == 0) {
+#endif // defined
     color_YCbCr pixel;
-
     long long int i;
+    /* For MPI imputed image will be divided by sizeX on world_size parts */
+
+#if defined _USEMPI
+    for (i = 0; i < (sizeX * sizeY/world_size); i++) {
+         pixel = convertRGBtoYCbCr(*inputMas);
+         *resMas = pixel;
+         *resMas++;
+         *inputMas++;
+    }
+    //free(inputMas);
+
+    resMas = masBackup;
+#else
     for (i = 0; i < (sizeX * sizeY); i++) {
          pixel = convertRGBtoYCbCr(*inputMas);
          *resMas = pixel;
@@ -403,6 +420,10 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     //free(inputMas);
 
     resMas = masBackup;
+#endif // defined
+
+
+
 
     /*
         Calculating DCT matrix and transposed DCT matrix. Them will be used on the next step
@@ -420,7 +441,11 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
         Dividing image on squares 8x8 and run compress algorithm for every of them
     */
     int numOfSqrX = sizeX / 8;
+#if defined _USEMPI
+    int numOfSqrY = sizeY/ world_size / 8;
+#else
     int numOfSqrY = sizeY / 8;
+#endif // defined
 
     int curNumOfSqrX = 0;
     int curNumOfSqrY = 0;
@@ -436,6 +461,18 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     start_time = omp_get_wtime();
     omp_set_dynamic(0);
     #pragma omp parallel for private (curNumOfSqrY, curNumOfSqrX) shared(resMas, imageBitSize, all_Y_image, all_Cb_image, all_Cr_image, DCTmatrix, TranspDCTMatrx, QuatnMatrix)
+#elif _USEMPI
+    double start_time, end_time, diff_time;
+    MPI_Init(NULL, NULL);
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    int userChoice = 1;
+    if (world_rank == 0)
+    {
+        printf("\World rank == 0 =, it's a problem\n");
+    }
 #else
     clock_t t;
     t = clock();
@@ -679,6 +716,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             strcat(all_Cr_image[curSqrNum], "\0");
             all_Cr_image[curSqrNum] = (char*)realloc(all_Cr_image[curSqrNum], (coddedCrlen + 1) * sizeof(char));
 
+#if defined _USEMPI
+            if (world_rank != 0)
+            {
+                MPI_Send(all_Y_image[curSqrNum], coddedYlen, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+                MPI_Send(all_Cb_image[curSqrNum], coddedCblen, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+                MPI_Send(all_Cr_image[curSqrNum], coddedCrlen, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+            }
+#endif
             free(masRLECoddedCr);
             imageBitSize += coddedCrlen;
             free(curVectY);
@@ -690,10 +735,25 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
             free(curSqrCr);
         }
     }
-//#if defined _USEOPENMP
+#if defined _USEOPENMP
     #pragma omp end parallel
-//#endif // USEOPENMP
+#endif // USEOPENMP
 
+#if defined _USEMPI
+    char* all_image_bit_sream = (char*)malloc((imageBitSize + 1) * sizeof(char));
+    strcpy(all_image_bit_sream,"\0");
+     for (int i = 1;i < world_size; i++) {
+        for (i = 0; i < (numOfSqrX * numOfSqrY); i++) {
+            MPI_Recv(all_Y_image[i], imageSize, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(all_Cb_image[i], imageSize, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(all_Cr_image[i], imageSize, MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            strcat(all_image_bit_sream, all_Y_image[i]);
+            strcat(all_image_bit_sream, all_Cb_image[i]);
+            strcat(all_image_bit_sream, all_Cr_image[i]);
+        }
+     }
+}
+#else
     char* all_image_bit_sream = (char*)malloc((imageBitSize + 1) * sizeof(char));
     strcpy(all_image_bit_sream,"\0");
     for (i = 0; i < (numOfSqrX * numOfSqrY); i++) {
@@ -704,6 +764,8 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
         strcat(all_image_bit_sream, all_Cr_image[i]);
         free(all_Cr_image[i]);
     }
+#endif // defined
+
 #if defined _USEOPENMP
     end_time = omp_get_wtime();
     diff_time = end_time - start_time;
@@ -712,6 +774,14 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
     printf("\n Time of encoding is = %f\n", diff_time);
     writeResults(quality, diff_time);
     writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_openmp.jpeg");
+#elifdef _USEMPI
+       end_time = MPI_Wtime();
+       dif_time = end_time - start_time;
+       printf("BitsCount = %d", imageBitSize);
+       printf("\nEncoding time = %f\n", (((float)t) / CLOCKS_PER_SEC));
+       writeResults(quality, diff_time);
+       writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_mpi.jpeg");
+       MPI_Finalize();
 #else
     t = clock() - t;
     printf("BitsCount = %d", imageBitSize);

@@ -7,6 +7,10 @@
 int thread_number;
 #endif
 
+#if defined _USEMPI
+#include <mpi.h>
+#endif //define
+
 int main()
 {
     int i = 0;
@@ -14,6 +18,8 @@ int main()
     int compression;
 #if defined _USEOPENMP
     FILE* ptr = fopen("config_omp.txt","rt");
+#elifdef _USEMPI
+    FILE* ptr = fopen("config_mpi.txt","rt");
 #else
     FILE* ptr = fopen("config.txt","rt");
 #endif // defined
@@ -34,6 +40,8 @@ int main()
                 convertToJpeg(bmpimg, img_width, img_height, compression);
             }
         }
+#elifdef _USEMPI
+
 #else
         while (fscanf (ptr, "%s%u", filename, &compression) != EOF) {
             i++;
