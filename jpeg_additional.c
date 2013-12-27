@@ -1,4 +1,10 @@
 #include "jpeg_additional.h"
+
+extern long long int image_dots;
+#if defined _USEOPENMP
+extern int thread_number;
+#endif
+
 /*
     Printing all elemens of array of palette_rgb elements
 */
@@ -137,4 +143,20 @@ void writeJpeg(char* imagestream,int Imgsize, char* imagename)
     int fd_out = creat(imagename, PERMS);
     write(fd_out, imagestream, Imgsize);
     close(fd_out);
+}
+
+void writeResults(int compression, float time_of_conv)
+{
+#if defined _USEOPENMP
+    FILE* ptr = fopen("results_openmp.txt","at");
+#else
+    FILE* ptr = fopen("results.txt","at");
+#endif
+    fprintf(ptr, "Pictute size   = %lu\n", image_dots);
+    fprintf(ptr, "Compression    = %u\n", compression);
+#if defined _USEOPENMP
+    fprintf(ptr, "Threads cnt.   = %u\n", thread_number);
+#endif // defined
+    fprintf(ptr, "Time of compr. = %f\n\n", time_of_conv);
+    fclose(ptr);
 }

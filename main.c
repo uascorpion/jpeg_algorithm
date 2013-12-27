@@ -9,29 +9,45 @@ int thread_number;
 
 int main()
 {
-    char filename[80];
-    printf("\n Enter file name = ");
-    gets(filename);
-
-    printf("\n Enter commpression value = ");
+    int i = 0;
+    char* filename = (char*)calloc(80, sizeof(char));
     int compression;
-    scanf("%d", &compression);
-
 #if defined _USEOPENMP
-    printf("\n\n Enter number of threads = ");
-    scanf("%d", &thread_number);
-#endif //USEOPENMP
+    FILE* ptr = fopen("config_omp.txt","rt");
+#else
+    FILE* ptr = fopen("config.txt","rt");
+#endif // defined
 
-    int fd = open(filename, O_RDONLY, 0);    // Creationg file descriptor
-
-    if (-1 == fd) {
-        printf("Can't open file\n");
+    if (NULL == ptr) {
+        printf("Can't open config file\n");
     }
-
     else {
-        palette_rgb* bmpimg = bmp_parse(fd);
-        convertToJpeg(bmpimg, img_width, img_height, compression);
+#if defined _USEOPENMP
+        while (fscanf (ptr, "%s%u%u", filename, &compression, &thread_number) != EOF) {
+            i++;
+            int fd = open(filename, O_RDONLY, 0);
+            if (-1 == fd) {
+                printf("Can't open file\n");
+            }
+            else {
+                palette_rgb* bmpimg = bmp_parse(fd);
+                convertToJpeg(bmpimg, img_width, img_height, compression);
+            }
+        }
+#else
+        while (fscanf (ptr, "%s%u", filename, &compression) != EOF) {
+            i++;
+            int fd = open(filename, O_RDONLY, 0);
+            if (-1 == fd) {
+                printf("Can't open file\n");
+            }
+            else {
+                palette_rgb* bmpimg = bmp_parse(fd);
+                convertToJpeg(bmpimg, img_width, img_height, compression);
+            }
+        }
+#endif // defined
+    fclose(ptr);
     }
-
     return 0;
 }

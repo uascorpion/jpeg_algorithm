@@ -710,11 +710,13 @@ void convertToJpeg (palette_rgb* inputMas, dword_t sizeX, dword_t sizeY, int qua
 
     printf("BitsCount = %d", imageBitSize);
     printf("\n Time of encoding is = %f\n", diff_time);
+    writeResults(quality, diff_time);
     writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_openmp.jpeg");
 #else
     t = clock() - t;
     printf("BitsCount = %d", imageBitSize);
     printf("\nEncoding time = %f\n", (((float)t) / CLOCKS_PER_SEC));
+    writeResults(quality, (float)(((float)t) / CLOCKS_PER_SEC));
     writeJpeg(all_image_bit_sream, imageBitSize * sizeof(char), "jpeg_.jpeg");
 #endif // USEOPENMP
 
