@@ -72,7 +72,6 @@ typedef struct {
     byte_t blue   : 5;
     byte_t green  : 6;
     byte_t red    : 5;
-    byte_t unused : 1;
 } palette_rgb_5_6_5;
 
 /* Structure of masks for every color */
